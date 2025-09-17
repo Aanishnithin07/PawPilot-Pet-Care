@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Container, Box, Typography, TextField, Button, Avatar } from '@mui/material';
+import { Container, Box, Typography, TextField, Button, Avatar, Grid, Link } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function LoginPage() {
@@ -19,15 +19,15 @@ function LoginPage() {
         }),
         {
           headers: {
+            // THE FIX IS HERE:
             'Content-Type': 'application/x-www-form-urlencoded',
           },
         }
       );
       
-      // If login is successful, store the token and redirect
       if (response.data.access_token) {
         localStorage.setItem('token', response.data.access_token);
-        navigate('/'); // Redirect to the dashboard
+        navigate('/');
       }
     } catch (error) {
       console.error('Login failed:', error);
@@ -84,6 +84,13 @@ function LoginPage() {
           >
             Sign In
           </Button>
+          <Grid container justifyContent="flex-end">
+            <Grid item>
+              <Link component={RouterLink} to="/register" variant="body2">
+                {"Don't have an account? Sign Up"}
+              </Link>
+            </Grid>
+          </Grid>
         </Box>
       </Box>
     </Container>

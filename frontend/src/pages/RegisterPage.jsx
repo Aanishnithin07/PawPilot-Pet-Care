@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Container, Box, Typography, TextField, Button, Avatar } from '@mui/material';
+import { Container, Box, Typography, TextField, Button, Avatar, Grid, Link } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function RegisterPage() {
@@ -12,14 +12,13 @@ function RegisterPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      // Note: The register endpoint expects JSON data
       await axios.post('http://127.0.0.1:8000/register', {
         email: email,
         password: password,
       });
-      
+
       alert('Registration successful! Please log in.');
-      navigate('/login'); // Redirect to the login page
+      navigate('/login');
 
     } catch (error) {
       console.error('Registration failed:', error);
@@ -76,6 +75,13 @@ function RegisterPage() {
           >
             Sign Up
           </Button>
+          <Grid container justifyContent="flex-end">
+            <Grid item>
+              <Link component={RouterLink} to="/login" variant="body2">
+                Already have an account? Sign in
+              </Link>
+            </Grid>
+          </Grid>
         </Box>
       </Box>
     </Container>
