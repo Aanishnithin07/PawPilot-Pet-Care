@@ -10,7 +10,7 @@ class Car {
         this.carNumber = carNumber;
         this.ownerName = ownerName;
         this.prev = null;
-        this.next = null;
+        //this.next = null;
     }
 }
 
