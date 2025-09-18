@@ -9,7 +9,7 @@ class Car {
     public Car(String carNumber, String ownerName) {
         this.carNumber = carNumber;
         this.ownerName = ownerName;
-        this.prev = null;
+        //this.prev = null;
         //this.next = null;
     }
 }
