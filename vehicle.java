@@ -4,7 +4,7 @@ import java.util.Scanner;
 class Car {
     String carNumber;
     String ownerName;
-    Car prev, next;
+    Car prev, next;;
 
     public Car(String carNumber, String ownerName) {
         this.carNumber = carNumber;
