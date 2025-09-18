@@ -17,7 +17,7 @@ const darkTheme = createTheme({
 function App() {
   return (
     <ThemeProvider theme={darkTheme}>
-      <CssBaseline /> {/* This is the key component */}
+      <CssBaseline /> {/* This is the key component that resets styles */}
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />

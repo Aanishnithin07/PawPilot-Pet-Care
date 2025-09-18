@@ -29,3 +29,14 @@ def create_pet_for_user(db: Session, pet: schemas.PetCreate, user_id: int):
     db.commit()
     db.refresh(db_pet)
     return db_pet
+# Add these two functions to the end of crud.py
+
+def create_vaccination_for_pet(db: Session, vaccination: schemas.VaccinationCreate, pet_id: int):
+    db_vaccination = models.Vaccination(**vaccination.dict(), pet_id=pet_id)
+    db.add(db_vaccination)
+    db.commit()
+    db.refresh(db_vaccination)
+    return db_vaccination
+
+def get_vaccinations_for_pet(db: Session, pet_id: int):
+    return db.query(models.Vaccination).filter(models.Vaccination.pet_id == pet_id).all()
