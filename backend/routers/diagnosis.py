@@ -84,3 +84,32 @@ async def get_injury_analysis(file: UploadFile = File(...)):
     except Exception as e:
         print(f"THE REAL ERROR IS (Injury Image Analysis): {e}")
         raise HTTPException(status_code=500, detail=f"Failed to analyze image for injury: {e}")
+    # In backend/routers/diagnosis.py, add this new code at the end of the file.
+
+# Pydantic model for nutrition request
+class NutritionRequest(BaseModel):
+    breed: str
+    weight_kg: float
+    age_years: int # Assuming age in years for simplicity
+
+@router.post("/nutrition-analysis")
+async def get_nutrition_analysis(request: NutritionRequest):
+    try:
+        model = genai.GenerativeModel('gemini-1.5-flash-latest')
+        prompt = (
+            f"As a pet nutritionist assistant, provide tailored dietary advice for a {request.breed} dog "
+            f"that is {request.age_years} years old and weighs {request.weight_kg} kg. "
+            "Focus on: \n"
+            "1. Recommended daily caloric intake (estimate if necessary).\n"
+            "2. General guidelines for protein, fat, and carbohydrate percentages.\n"
+            "3. Examples of beneficial ingredients or food types (e.g., lean meats, vegetables, healthy fats).\n"
+            "4. Any specific dietary considerations or common issues for this breed/age/weight.\n"
+            "Avoid mentioning specific brands or supplements. Keep the language friendly and easy to understand. "
+            "Conclude by recommending consultation with a vet or a certified pet nutritionist for a personalized diet plan."
+        )
+        response = model.generate_content(prompt)
+        return {"nutrition_advice": response.text}
+
+    except Exception as e:
+        print(f"THE REAL ERROR IS (Nutrition Analysis): {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get nutrition analysis: {e}")
