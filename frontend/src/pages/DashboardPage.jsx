@@ -7,7 +7,7 @@ import DashboardTabs from '../components/DashboardTabs';
 import VaccinationModal from '../components/VaccinationModal';
 import VetCommunityTab from '../components/VetCommunityTab';
 import NutritionTab from '../components/NutritionTab'; // <--- THIS IS THE CRITICAL LINE!
-
+import VoiceAssistantTab from '../components/VoiceAssistantTab'; // Add this line
 // Sub-component for the "My Pets" Tab Content
 function MyPetsTab({ pets, upcomingVaccinations, onAddPet, onOpenVacModal }) {
   const [petName, setPetName] = useState('');
@@ -253,21 +253,16 @@ function DashboardPage() {
         My Pets Dashboard
       </Typography>
       
-     // In frontend/src/pages/DashboardPage.jsx
+     INDIA'S FIRST EVER COMPLETE PETCARE PLATFORM
 
+// Add this new prop for the voice assistant tab
 <DashboardTabs 
-  petListComponent={
-    <MyPetsTab 
-      pets={pets}
-      upcomingVaccinations={upcomingVaccinations}
-      onAddPet={handleAddPet}
-      onOpenVacModal={handleOpenModal}
-    />
-  }
+  petListComponent={<MyPetsTab pets={pets} upcomingVaccinations={upcomingVaccinations} onAddPet={handleAddPet} onOpenVacModal={handleOpenModal} />}
   symptomCheckerComponent={<SymptomCheckerTab />}
   vetLocatorComponent={<VetLocator />}
   vetCommunityComponent={<VetCommunityTab />}
   nutritionComponent={<NutritionTab />}
+  voiceAssistantComponent={<VoiceAssistantTab />}
 />
 
       {selectedPet && <VaccinationModal open={modalOpen} onClose={handleCloseModal} pet={selectedPet} />}

@@ -10,8 +10,7 @@ function TabPanel(props) {
   );
 }
 
-// Ensure all props are present here
-function DashboardTabs({ petListComponent, symptomCheckerComponent, vetLocatorComponent, vetCommunityComponent, nutritionComponent }) {
+function DashboardTabs({ petListComponent, symptomCheckerComponent, vetLocatorComponent, vetCommunityComponent, nutritionComponent, voiceAssistantComponent }) {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -21,29 +20,23 @@ function DashboardTabs({ petListComponent, symptomCheckerComponent, vetLocatorCo
   return (
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChange} aria-label="dashboard tabs" centered>
+        <Tabs value={value} onChange={handleChange} aria-label="dashboard tabs" variant="scrollable" scrollButtons="auto">
           <Tab label="My Pets" />
           <Tab label="AI Symptom Checker" />
           <Tab label="Vet Locator" />
           <Tab label="Talk to a Vet" />
-          <Tab label="Wellness & Nutrition" /> {/* <--- Make sure this Tab is present */}
+          <Tab label="Wellness & Nutrition" />
+          <Tab label="Voice Assistant" />
+          
         </Tabs>
       </Box>
-      <TabPanel value={value} index={0}>
-        {petListComponent}
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        {symptomCheckerComponent}
-      </TabPanel>
-      <TabPanel value={value} index={2}>
-        {vetLocatorComponent}
-      </TabPanel>
-      <TabPanel value={value} index={3}>
-        {vetCommunityComponent}
-      </TabPanel>
-      <TabPanel value={value} index={4}> {/* <--- Make sure this TabPanel is present with index={4} */}
-        {nutritionComponent}
-      </TabPanel>
+      <TabPanel value={value} index={0}>{petListComponent}</TabPanel>
+      <TabPanel value={value} index={1}>{symptomCheckerComponent}</TabPanel>
+      <TabPanel value={value} index={2}>{vetLocatorComponent}</TabPanel>
+      <TabPanel value={value} index={3}>{vetCommunityComponent}</TabPanel>
+      <TabPanel value={value} index={4}>{nutritionComponent}</TabPanel>
+      <TabPanel value={value} index={5}>{voiceAssistantComponent}</TabPanel>
+      
     </Box>
   );
 }
