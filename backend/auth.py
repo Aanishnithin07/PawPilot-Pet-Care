@@ -1,11 +1,13 @@
+import os
 from fastapi import Depends, HTTPException, status, Header
 from sqlalchemy.orm import Session
 from typing import Optional
 import schemas, database, models
 from firebase_config import verify_firebase_token, initialize_firebase
 
-# Initialize Firebase on module import
-initialize_firebase()
+# Initialize Firebase on module import (skip in testing)
+if not os.getenv("TESTING"):
+    initialize_firebase()
 
 async def get_current_user(
     authorization: Optional[str] = Header(None),

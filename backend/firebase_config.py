@@ -12,6 +12,23 @@ def initialize_firebase():
     
     service_account_json = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")
     if not service_account_json:
+        # For testing, initialize with test credentials
+        if os.getenv("TESTING") == "true":
+            # Use test project credentials or mock
+            try:
+                firebase_admin.initialize_app(credentials.Certificate({
+                    "type": "service_account",
+                    "project_id": "test-project",
+                    "private_key_id": "test-key-id",
+                    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKB\nxhXctbdgZATkr+IfVVoEXGkRIdEMBMlldnIYsKlkLkmSWIFtszplFw==\n-----END PRIVATE KEY-----\n",
+                    "client_email": "test@test-project.iam.gserviceaccount.com",
+                    "client_id": "123456789",
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token"
+                }))
+                return
+            except:
+                pass
         raise ValueError("FIREBASE_SERVICE_ACCOUNT_JSON environment variable not set")
     
     try:

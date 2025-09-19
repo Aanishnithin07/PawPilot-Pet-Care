@@ -1,11 +1,13 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from firebase_config import initialize_firebase
 # Make sure 'places' is imported here
 from routers import authentication, pets, diagnosis, vaccinations, places
 
-# Initialize Firebase on startup
-initialize_firebase()
+# Initialize Firebase on startup (skip during testing)
+if not os.getenv("TESTING"):
+    initialize_firebase()
 
 # This creates the main app instance
 app = FastAPI()

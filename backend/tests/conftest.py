@@ -7,6 +7,7 @@ from unittest.mock import patch, MagicMock
 
 # Set test environment
 os.environ["DATABASE_URL"] = "sqlite:///./test.db"
+os.environ["TESTING"] = "true"
 
 from main import app
 from database import get_db, Base
@@ -25,13 +26,13 @@ def override_get_db():
 
 app.dependency_overrides[get_db] = override_get_db
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def client():
     # Create tables
     Base.metadata.create_all(bind=engine)
     with TestClient(app) as c:
         yield c
-    # Drop tables after tests
+    # Clean up tables after each test
     Base.metadata.drop_all(bind=engine)
 
 @pytest.fixture

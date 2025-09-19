@@ -18,9 +18,9 @@ class TestDatabase:
         db = next(db_gen)
         
         user = models.User(
-            firebase_uid="test-uid-123",
-            email="test@example.com",
-            name="Test User"
+            firebase_uid="test-uid-database-123",
+            email="database-test@example.com",
+            name="Database Test User"
         )
         
         db.add(user)
@@ -28,9 +28,9 @@ class TestDatabase:
         db.refresh(user)
         
         assert user.id is not None
-        assert user.firebase_uid == "test-uid-123"
-        assert user.email == "test@example.com"
-        assert user.name == "Test User"
+        assert user.firebase_uid == "test-uid-database-123"
+        assert user.email == "database-test@example.com"
+        assert user.name == "Database Test User"
         
         db.close()
 
@@ -41,9 +41,9 @@ class TestDatabase:
         
         # Create user first
         user = models.User(
-            firebase_uid="test-uid-456",
-            email="petowner@example.com",
-            name="Pet Owner"
+            firebase_uid="test-uid-pet-456",
+            email="petowner-db@example.com",
+            name="Pet Owner DB"
         )
         db.add(user)
         db.commit()
@@ -51,8 +51,8 @@ class TestDatabase:
         
         # Create pet
         pet = models.Pet(
-            name="Test Pet",
-            breed="Test Breed",
+            name="Test Pet DB",
+            breed="Test Breed DB",
             age=2,
             weight=15.0,
             owner_id=user.id
@@ -63,7 +63,7 @@ class TestDatabase:
         db.refresh(pet)
         
         assert pet.id is not None
-        assert pet.name == "Test Pet"
+        assert pet.name == "Test Pet DB"
         assert pet.owner_id == user.id
         
         db.close()
@@ -77,17 +77,17 @@ class TestDatabase:
         
         # Create user and pet first
         user = models.User(
-            firebase_uid="test-uid-789",
-            email="vaccowner@example.com",
-            name="Vaccination Owner"
+            firebase_uid="test-uid-vacc-789",
+            email="vaccowner-db@example.com",
+            name="Vaccination Owner DB"
         )
         db.add(user)
         db.commit()
         db.refresh(user)
         
         pet = models.Pet(
-            name="Vaccinated Pet",
-            breed="Healthy Breed",
+            name="Vaccinated Pet DB",
+            breed="Healthy Breed DB",
             age=1,
             weight=10.0,
             owner_id=user.id
@@ -98,7 +98,7 @@ class TestDatabase:
         
         # Create vaccination
         vaccination = models.Vaccination(
-            vaccine_name="Rabies",
+            vaccine_name="Rabies DB",
             date_given=date.today(),
             due_date=date(2026, 1, 19),
             pet_id=pet.id
@@ -109,7 +109,7 @@ class TestDatabase:
         db.refresh(vaccination)
         
         assert vaccination.id is not None
-        assert vaccination.vaccine_name == "Rabies"
+        assert vaccination.vaccine_name == "Rabies DB"
         assert vaccination.pet_id == pet.id
         
         db.close()

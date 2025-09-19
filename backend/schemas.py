@@ -34,7 +34,7 @@ class Pet(PetBase):
     vaccinations: List[Vaccination] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- User Schemas ---
 class UserBase(BaseModel):

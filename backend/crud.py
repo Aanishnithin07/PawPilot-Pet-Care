@@ -12,9 +12,16 @@ def verify_password(plain_password, hashed_password):
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
 
-def create_user(db: Session, user: schemas.UserCreate):
-    hashed_password = pwd_context.hash(user.password)
-    db_user = models.User(email=user.email, hashed_password=hashed_password)
+def get_user_by_firebase_uid(db: Session, firebase_uid: str):
+    return db.query(models.User).filter(models.User.firebase_uid == firebase_uid).first()
+
+def create_user_from_firebase(db: Session, firebase_uid: str, email: str, name: str = None):
+    """Create user from Firebase authentication info"""
+    db_user = models.User(
+        firebase_uid=firebase_uid,
+        email=email,
+        name=name
+    )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -24,7 +31,7 @@ def get_pets_by_user(db: Session, user_id: int):
     return db.query(models.Pet).filter(models.Pet.owner_id == user_id).all()
 
 def create_pet_for_user(db: Session, pet: schemas.PetCreate, user_id: int):
-    db_pet = models.Pet(**pet.dict(), owner_id=user_id)
+    db_pet = models.Pet(**pet.model_dump(), owner_id=user_id)
     db.add(db_pet)
     db.commit()
     db.refresh(db_pet)
@@ -32,7 +39,7 @@ def create_pet_for_user(db: Session, pet: schemas.PetCreate, user_id: int):
 # Add these two functions to the end of crud.py
 
 def create_vaccination_for_pet(db: Session, vaccination: schemas.VaccinationCreate, pet_id: int):
-    db_vaccination = models.Vaccination(**vaccination.dict(), pet_id=pet_id)
+    db_vaccination = models.Vaccination(**vaccination.model_dump(), pet_id=pet_id)
     db.add(db_vaccination)
     db.commit()
     db.refresh(db_vaccination)
