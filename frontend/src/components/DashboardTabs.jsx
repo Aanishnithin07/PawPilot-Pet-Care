@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Tabs, Tab, Box, Typography } from '@mui/material';
+import { Tabs, Tab, Box } from '@mui/material';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -10,7 +10,8 @@ function TabPanel(props) {
   );
 }
 
-function DashboardTabs({ petListComponent, symptomCheckerComponent, vetLocatorComponent }) {
+// Ensure all props are present here
+function DashboardTabs({ petListComponent, symptomCheckerComponent, vetLocatorComponent, vetCommunityComponent, nutritionComponent }) {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -20,10 +21,12 @@ function DashboardTabs({ petListComponent, symptomCheckerComponent, vetLocatorCo
   return (
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChange} aria-label="dashboard tabs">
+        <Tabs value={value} onChange={handleChange} aria-label="dashboard tabs" centered>
           <Tab label="My Pets" />
           <Tab label="AI Symptom Checker" />
           <Tab label="Vet Locator" />
+          <Tab label="Talk to a Vet" />
+          <Tab label="Wellness & Nutrition" /> {/* <--- Make sure this Tab is present */}
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
@@ -34,6 +37,12 @@ function DashboardTabs({ petListComponent, symptomCheckerComponent, vetLocatorCo
       </TabPanel>
       <TabPanel value={value} index={2}>
         {vetLocatorComponent}
+      </TabPanel>
+      <TabPanel value={value} index={3}>
+        {vetCommunityComponent}
+      </TabPanel>
+      <TabPanel value={value} index={4}> {/* <--- Make sure this TabPanel is present with index={4} */}
+        {nutritionComponent}
       </TabPanel>
     </Box>
   );
