@@ -1,39 +1,65 @@
-import React, { useState } from 'react';
-import { Container, Box, Typography, TextField, Button, Avatar, Grid, Link } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Container, Box, Typography, TextField, Button, Avatar, Grid, Link, Divider, Alert } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import GoogleIcon from '@mui/icons-material/Google';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { signInWithEmail, signInWithGoogle } from '../firebase/config';
+import { useAuth } from '../contexts/AuthContext';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
 
-  const handleSubmit = async (event) => {
+  useEffect(() => {
+    if (user && !authLoading) {
+      navigate('/');
+    }
+  }, [user, authLoading, navigate]);
+
+  const handleEmailSignIn = async (event) => {
     event.preventDefault();
+    setError('');
+    setLoading(true);
+
     try {
-      const response = await axios.post('http://127.0.0.1:8000/login', 
-        new URLSearchParams({
-          username: email,
-          password: password,
-        }),
-        {
-          headers: {
-            // THE FIX IS HERE:
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        }
-      );
-      
-      if (response.data.access_token) {
-        localStorage.setItem('token', response.data.access_token);
-        navigate('/');
-      }
+      await signInWithEmail(email, password);
+      // Navigation will happen automatically via AuthContext
     } catch (error) {
       console.error('Login failed:', error);
-      alert('Login failed! Please check your email and password.');
+      setError(error.message || 'Login failed. Please check your email and password.');
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setLoading(true);
+
+    try {
+      await signInWithGoogle();
+      // Navigation will happen automatically via AuthContext
+    } catch (error) {
+      console.error('Google sign-in failed:', error);
+      setError(error.message || 'Google sign-in failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (authLoading) {
+    return (
+      <Container component="main" maxWidth="xs">
+        <Box sx={{ marginTop: 8, display: 'flex', justifyContent: 'center' }}>
+          <Typography>Loading...</Typography>
+        </Box>
+      </Container>
+    );
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -51,7 +77,14 @@ function LoginPage() {
         <Typography component="h1" variant="h5">
           Sign in to PawPilot
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        
+        {error && (
+          <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
+            {error}
+          </Alert>
+        )}
+
+        <Box component="form" onSubmit={handleEmailSignIn} noValidate sx={{ mt: 1, width: '100%' }}>
           <TextField
             margin="normal"
             required
@@ -63,6 +96,7 @@ function LoginPage() {
             autoFocus
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
           />
           <TextField
             margin="normal"
@@ -75,15 +109,31 @@ function LoginPage() {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
           />
           <Button
             type="submit"
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
+            disabled={loading}
           >
-            Sign In
+            {loading ? 'Signing In...' : 'Sign In'}
           </Button>
+          
+          <Divider sx={{ my: 2 }}>OR</Divider>
+          
+          <Button
+            fullWidth
+            variant="outlined"
+            startIcon={<GoogleIcon />}
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            sx={{ mb: 2 }}
+          >
+            Sign in with Google
+          </Button>
+          
           <Grid container justifyContent="flex-end">
             <Grid item>
               <Link component={RouterLink} to="/register" variant="body2">

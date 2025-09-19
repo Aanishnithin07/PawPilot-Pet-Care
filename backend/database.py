@@ -1,16 +1,24 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./pawpilot.db"
+# Use NeonDB connection string from environment, fallback to SQLite for development
+DATABASE_URL = os.getenv("DATABASE_URL") or os.getenv("NEON_DATABASE_URL")
+if not DATABASE_URL:
+    # Fallback to SQLite for local development
+    DATABASE_URL = "sqlite:///./pawpilot.db"
+    engine = create_engine(
+        DATABASE_URL, connect_args={"check_same_thread": False}
+    )
+else:
+    # PostgreSQL connection (NeonDB)
+    engine = create_engine(DATABASE_URL)
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
-# Add this function to the end of the file
+
 def get_db():
     db = SessionLocal()
     try:

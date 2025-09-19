@@ -6,8 +6,11 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
+    firebase_uid = Column(String, unique=True, index=True, nullable=False)
     email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
+    name = Column(String, nullable=True)
+    # Keep hashed_password for migration period, will be removed later
+    hashed_password = Column(String, nullable=True)
 
     pets = relationship("Pet", back_populates="owner")
 

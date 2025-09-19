@@ -39,18 +39,15 @@ class Pet(PetBase):
 # --- User Schemas ---
 class UserBase(BaseModel):
     email: str
-
-class UserCreate(UserBase):
-    password: str
+    name: Optional[str] = None
 
 class User(UserBase):
     id: int
-
-    # This allows us to see the user's pets when we fetch a user
+    firebase_uid: str
     pets: List[Pet] = [] 
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Add this to the end of schemas.py
 class TokenData(BaseModel):

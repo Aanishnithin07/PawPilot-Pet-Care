@@ -1,12 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import models
-from database import engine
+from firebase_config import initialize_firebase
 # Make sure 'places' is imported here
 from routers import authentication, pets, diagnosis, vaccinations, places
 
-# This creates the database tables
-models.Base.metadata.create_all(bind=engine)
+# Initialize Firebase on startup
+initialize_firebase()
 
 # This creates the main app instance
 app = FastAPI()

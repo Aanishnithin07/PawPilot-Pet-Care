@@ -1,8 +1,10 @@
 absl-py==2.3.1
+alembic==1.13.1
 annotated-types==0.7.0
 anyio==4.10.0
 astunparse==1.6.3
 bcrypt==4.3.0
+firebase-admin==6.4.0
 cachetools==5.5.2
 certifi==2025.8.3
 cffi==2.0.0
@@ -52,6 +54,9 @@ pydantic_core==2.33.2
 Pygments==2.19.2
 pyparsing==3.2.4
 python-dotenv==1.1.1
+psycopg2-binary==2.9.9
+pytest==7.4.4
+pytest-asyncio==0.21.1
 python-jose==3.5.0
 python-multipart==0.0.20
 PyYAML==6.0.2
