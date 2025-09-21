@@ -6,15 +6,17 @@ import VetLocator from '../components/VetLocator';
 import DashboardTabs from '../components/DashboardTabs';
 import VaccinationModal from '../components/VaccinationModal';
 import VetCommunityTab from '../components/VetCommunityTab';
-import NutritionTab from '../components/NutritionTab'; // <--- THIS IS THE CRITICAL LINE!
-import VoiceAssistantTab from '../components/VoiceAssistantTab'; // Add this line
+import NutritionTab from '../components/NutritionTab';
+import VoiceAssistantTab from '../components/VoiceAssistantTab'; // Ensure this path is correct
+import { useLanguage } from '../context/LanguageContext'; // Ensure this path is correct
+
 // Sub-component for the "My Pets" Tab Content
-function MyPetsTab({ pets, upcomingVaccinations, onAddPet, onOpenVacModal }) {
+function MyPetsTab({ pets, upcomingVaccinations, onAddPet, onOpenVacModal, t }) {
   const [petName, setPetName] = useState('');
   const [petBreed, setPetBreed] = useState('');
   const [petAge, setPetAge] = useState('');
   const [petWeight, setPetWeight] = useState('');
-  const [isDetecting, setIsDetecting] = useState(false); // For breed auto-detection (already present)
+  const [isDetecting, setIsDetecting] = useState(false);
 
   const handleAddPetSubmit = (event) => {
     event.preventDefault();
@@ -42,7 +44,7 @@ function MyPetsTab({ pets, upcomingVaccinations, onAddPet, onOpenVacModal }) {
       }
     } catch (error) {
       console.error('Failed to identify breed from photo:', error);
-      alert('Could not identify breed from the photo.');
+      alert(t('errorBreedIdentification'));
     }
     setIsDetecting(false);
   };
@@ -50,27 +52,26 @@ function MyPetsTab({ pets, upcomingVaccinations, onAddPet, onOpenVacModal }) {
   return (
     <Box>
       <Box component="form" onSubmit={handleAddPetSubmit} sx={{ mb: 4, p: 2, border: '1px solid grey', borderRadius: 2 }}>
-        <Typography variant="h6">Add a New Pet</Typography>
+        <Typography variant="h6">{t('addPetTitle')}</Typography>
         <Grid container spacing={2} sx={{ mt: 1 }}>
           <Grid item xs={12}>
             <Button variant="outlined" component="label" disabled={isDetecting}>
-              {isDetecting ? 'Analyzing Photo...' : 'Upload Photo to Auto-Detect Breed'}
+              {isDetecting ? t('analyzingPhoto') : t('uploadPhotoAutoDetectBreed')}
               <input type="file" hidden onChange={handlePhotoUpload} accept="image/*" />
             </Button>
           </Grid>
-          <Grid item xs={12} sm={6}><TextField fullWidth label="Pet Name" value={petName} onChange={(e) => setPetName(e.target.value)} required /></Grid>
-          <Grid item xs={12} sm={6}><TextField fullWidth label="Breed" value={petBreed} onChange={(e) => setPetBreed(e.target.value)} required /></Grid>
-          <Grid item xs={12} sm={6}><TextField fullWidth label="Age" type="number" value={petAge} onChange={(e) => setPetAge(e.target.value)} required /></Grid>
-          <Grid item xs={12} sm={6}><TextField fullWidth label="Weight (kg)" type="number" value={petWeight} onChange={(e) => setPetWeight(e.target.value)} required /></Grid>
+          <Grid item xs={12} sm={6}><TextField fullWidth label={t('petName')} value={petName} onChange={(e) => setPetName(e.target.value)} required /></Grid>
+          <Grid item xs={12} sm={6}><TextField fullWidth label={t('breed')} value={petBreed} onChange={(e) => setPetBreed(e.target.value)} required /></Grid>
+          <Grid item xs={12} sm={6}><TextField fullWidth label={t('age')} type="number" value={petAge} onChange={(e) => setPetAge(e.target.value)} required /></Grid>
+          <Grid item xs={12} sm={6}><TextField fullWidth label={t('weightKg')} type="number" value={petWeight} onChange={(e) => setPetWeight(e.target.value)} required /></Grid>
         </Grid>
-        <Button type="submit" variant="contained" sx={{ mt: 2 }}>Add Pet</Button>
+        <Button type="submit" variant="contained" sx={{ mt: 2 }}>{t('addPet')}</Button>
       </Box>
 
-      <Typography variant="h5" gutterBottom>My Pets</Typography>
-      {/* --- This block was updated for the welcome message --- */}
+      <Typography variant="h5" gutterBottom>{t('myPetsSectionTitle')}</Typography>
       {pets.length === 0 ? (
         <Alert severity="info" sx={{ mt: 2 }}>
-          Welcome to PawPilot! It looks like you haven't added a pet yet. Use the form above to get started!
+          {t('welcomeMessageNoPets')}
         </Alert>
       ) : (
         <Grid container spacing={3}>
@@ -79,45 +80,45 @@ function MyPetsTab({ pets, upcomingVaccinations, onAddPet, onOpenVacModal }) {
               <Card>
                 <CardContent>
                   <Typography variant="h6">{pet.name}</Typography>
-                  <Typography color="text.secondary">Breed: {pet.breed}</Typography>
-                  <Typography color="text.secondary">Age: {pet.age}</Typography>
-                  <Typography color="text.secondary">Weight: {pet.weight} kg</Typography>
+                  <Typography color="text.secondary">{t('breed')}: {pet.breed}</Typography>
+                  <Typography color="text.secondary">{t('age')}: {pet.age}</Typography>
+                  <Typography color="text.secondary">{t('weightKg')}: {pet.weight} {t('kgSuffix')}</Typography>
                 </CardContent>
                 <CardActions>
-                  <Button size="small" onClick={() => onOpenVacModal(pet)}>Vaccinations</Button>
+                  <Button size="small" onClick={() => onOpenVacModal(pet)}>{t('vaccinations')}</Button>
                 </CardActions>
               </Card>
             </Grid>
           ))}
         </Grid>
       )}
-      {/* --- End of welcome message block --- */}
 
       <Divider sx={{ my: 4 }} />
 
-      {/* --- This block was added for upcoming reminders --- */}
-      <Typography variant="h5" gutterBottom>Upcoming Reminders</Typography>
+      <Typography variant="h5" gutterBottom>{t('upcomingReminders')}</Typography>
       {upcomingVaccinations.length > 0 ? (
         <List>
-          {upcomingVaccinations.map(vac => (
-            <ListItem key={vac.id}>
-                <ListItemText
-                    primary={`${vac.vaccine_name} for ${pets.find(p => p.id === vac.pet_id)?.name || 'your pet'}`}
-                    secondary={`Due on: ${vac.due_date}`}
-                />
-            </ListItem>
-          ))}
+          {upcomingVaccinations.map(vac => {
+            const petNameForReminder = pets.find(p => p.id === vac.pet_id)?.name || t('yourPet');
+            return (
+              <ListItem key={vac.id}>
+                  <ListItemText
+                      primary={`${vac.vaccine_name} for ${petNameForReminder}`}
+                      secondary={`${t('dueDate')}: ${vac.due_date}`}
+                  />
+              </ListItem>
+            );
+          })}
         </List>
       ) : (
-        <Typography>No upcoming vaccination dates scheduled.</Typography>
+        <Typography>{t('noUpcomingVaccinations')}</Typography>
       )}
-      {/* --- End of upcoming reminders block --- */}
     </Box>
   );
 }
 
 // Sub-component for the "AI Symptom Checker" Tab Content
-function SymptomCheckerTab() {
+function SymptomCheckerTab({ t }) {
     const [symptoms, setSymptoms] = useState('');
     const [diagnosis, setDiagnosis] = useState('');
     const [isLoadingText, setIsLoadingText] = useState(false);
@@ -130,24 +131,22 @@ function SymptomCheckerTab() {
     const [breedResult, setBreedResult] = useState('');
     const [isLoadingBreed, setIsLoadingBreed] = useState(false);
 
-    // Remove all nutrition state variables and handlers
-
     const handleGetDiagnosis = async (event) => {
         event.preventDefault();
         setIsLoadingText(true);
         setDiagnosis('');
         try {
-            const response = await apiClient.post('/diagnose/symptoms', { symptoms });
+            const response = await apiClient.post('/diagnose/text', { symptoms }); // Corrected endpoint
             setDiagnosis(response.data.diagnosis);
         } catch (error) {
             console.error('Failed to get diagnosis:', error);
-            alert('Failed to get diagnosis.');
+            alert(t('errorGetDiagnosis'));
         }
         setIsLoadingText(false);
     };
 
     const handleInjuryAnalysis = async () => {
-        if (!injuryImageFile) return alert('Please select an injury photo first.');
+        if (!injuryImageFile) return alert(t('alertSelectInjuryPhoto'));
         setIsLoadingInjury(true);
         setInjuryResult('');
         const formData = new FormData();
@@ -157,13 +156,13 @@ function SymptomCheckerTab() {
             setInjuryResult(response.data.analysis);
         } catch (error) {
             console.error('Failed to analyze injury:', error);
-            alert('Failed to analyze image.');
+            alert(t('errorAnalyzeImage'));
         }
         setIsLoadingInjury(false);
     };
 
     const handleBreedIdentification = async () => {
-        if (!breedImageFile) return alert('Please select a pet photo first.');
+        if (!breedImageFile) return alert(t('alertSelectPetPhoto'));
         setIsLoadingBreed(true);
         setBreedResult('');
         const formData = new FormData();
@@ -173,7 +172,7 @@ function SymptomCheckerTab() {
             setBreedResult(response.data.identification);
         } catch (error) {
             console.error('Failed to identify breed:', error);
-            alert('Failed to identify image.');
+            alert(t('errorIdentifyImage'));
         }
         setIsLoadingBreed(false);
     };
@@ -181,43 +180,40 @@ function SymptomCheckerTab() {
     return (
         <Box>
             <Box component="form" onSubmit={handleGetDiagnosis} sx={{ mb: 4 }}>
-                <Typography variant="h6">AI Symptom Checker (Text)</Typography>
-                <TextField fullWidth multiline rows={3} label="Describe your pet's symptoms..." value={symptoms} onChange={(e) => setSymptoms(e.target.value)} required sx={{ mt: 2 }} />
-                <Button type="submit" variant="contained" sx={{ mt: 2 }} disabled={isLoadingText}>{isLoadingText ? <CircularProgress size={24} /> : 'Get AI Advice'}</Button>
-                {diagnosis && <Paper elevation={3} sx={{ mt: 2, p: 2 }}><Typography variant="h6">Preliminary Advice:</Typography><Typography sx={{ whiteSpace: 'pre-wrap', mt: 1 }}>{diagnosis}</Typography></Paper>}
+                <Typography variant="h6">{t('aiSymptomCheckerTitle')}</Typography>
+                <TextField fullWidth multiline rows={3} label={t('describeSymptoms')} value={symptoms} onChange={(e) => setSymptoms(e.target.value)} required sx={{ mt: 2 }} />
+                <Button type="submit" variant="contained" sx={{ mt: 2 }} disabled={isLoadingText}>{isLoadingText ? <CircularProgress size={24} /> : t('getAIAdvice')}</Button>
+                {diagnosis && <Paper elevation={3} sx={{ mt: 2, p: 2 }}><Typography variant="h6">{t('preliminaryAdvice')}:</Typography><Typography sx={{ whiteSpace: 'pre-wrap', mt: 1 }}>{diagnosis}</Typography></Paper>}
             </Box>
             <Divider sx={{ my: 4 }} />
             <Box sx={{ mb: 4 }}>
-                <Typography variant="h6">AI Injury/Condition Analysis (Image)</Typography>
-                <Button variant="contained" component="label" sx={{ mt: 2 }}>Upload Injury Photo<input type="file" hidden onChange={(e) => setInjuryImageFile(e.target.files[0])} accept="image/*" /></Button>
-                {injuryImageFile && <Typography sx={{ display: 'inline', ml: 2, fontStyle: 'italic' }}>Selected: {injuryImageFile.name}</Typography>}
-                <Button variant="contained" sx={{ mt: 2, ml: 2 }} onClick={handleInjuryAnalysis} disabled={!injuryImageFile || isLoadingInjury}>{isLoadingInjury ? <CircularProgress size={24} /> : 'Analyze Injury'}</Button>
-                {injuryResult && <Paper elevation={3} sx={{ mt: 2, p: 2 }}><Typography variant="h6">Analysis Result:</Typography><Typography sx={{ whiteSpace: 'pre-wrap', mt: 1 }}>{injuryResult}</Typography></Paper>}
+                <Typography variant="h6">{t('aiInjuryAnalysis')}</Typography>
+                <Button variant="contained" component="label" sx={{ mt: 2 }}>{t('uploadInjuryPhoto')}<input type="file" hidden onChange={(e) => setInjuryImageFile(e.target.files[0])} accept="image/*" /></Button>
+                {injuryImageFile && <Typography sx={{ display: 'inline', ml: 2, fontStyle: 'italic' }}>{t('selected')}: {injuryImageFile.name}</Typography>}
+                <Button variant="contained" sx={{ mt: 2, ml: 2 }} onClick={handleInjuryAnalysis} disabled={!injuryImageFile || isLoadingInjury}>{isLoadingInjury ? <CircularProgress size={24} /> : t('analyzeInjury')}</Button>
+                {injuryResult && <Paper elevation={3} sx={{ mt: 2, p: 2 }}><Typography variant="h6">{t('analysisResult')}:</Typography><Typography sx={{ whiteSpace: 'pre-wrap', mt: 1 }}>{injuryResult}</Typography></Paper>}
             </Box>
             <Divider sx={{ my: 4 }} />
             <Box>
-                <Typography variant="h6">Breed/Pet Identifier (Image)</Typography>
-                <Button variant="contained" component="label" sx={{ mt: 2 }}>Upload Pet Photo<input type="file" hidden onChange={(e) => setBreedImageFile(e.target.files[0])} accept="image/*" /></Button>
-                {breedImageFile && <Typography sx={{ display: 'inline', ml: 2, fontStyle: 'italic' }}>Selected: {breedImageFile.name}</Typography>}
-                <Button variant="contained" sx={{ mt: 2, ml: 2 }} onClick={handleBreedIdentification} disabled={!breedImageFile || isLoadingBreed}>{isLoadingBreed ? <CircularProgress size={24} /> : 'Identify Breed'}</Button>
-                {breedResult && <Paper elevation={3} sx={{ mt: 2, p: 2 }}><Typography variant="h6">Identification Result:</Typography><Typography sx={{ whiteSpace: 'pre-wrap', mt: 1 }}>{breedResult}</Typography></Paper>}
+                <Typography variant="h6">{t('breedPetIdentifier')}</Typography>
+                <Button variant="contained" component="label" sx={{ mt: 2 }}>{t('uploadPetPhoto')}<input type="file" hidden onChange={(e) => setBreedImageFile(e.target.files[0])} accept="image/*" /></Button>
+                {breedImageFile && <Typography sx={{ display: 'inline', ml: 2, fontStyle: 'italic' }}>{t('selected')}: {breedImageFile.name}</Typography>}
+                <Button variant="contained" sx={{ mt: 2, ml: 2 }} onClick={handleBreedIdentification} disabled={!breedImageFile || isLoadingBreed}>{isLoadingBreed ? <CircularProgress size={24} /> : t('identifyBreed')}</Button>
+                {breedResult && <Paper elevation={3} sx={{ mt: 2, p: 2 }}><Typography variant="h6">{t('identificationResult')}:</Typography><Typography sx={{ whiteSpace: 'pre-wrap', mt: 1 }}>{breedResult}</Typography></Paper>}
             </Box>
         </Box>
     );
 }
 
-
 // Main Dashboard Page Component
 function DashboardPage() {
   const [pets, setPets] = useState([]);
+  const [upcomingVaccinations, setUpcomingVaccinations] = useState([]);
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPet, setSelectedPet] = useState(null);
-  // --- ADDED: State for upcoming vaccinations ---
-  const [upcomingVaccinations, setUpcomingVaccinations] = useState([]);
+  const { t } = useLanguage(); 
 
-
-  // --- UPDATED: Combined fetch function for pets and vaccinations ---
   const fetchPetsAndVaccinations = useCallback(async () => {
     try {
       const petsResponse = await apiClient.get('/pets/');
@@ -226,46 +222,60 @@ function DashboardPage() {
       setUpcomingVaccinations(vaccResponse.data);
     } catch (error) {
       console.error('Failed to fetch data:', error);
+      alert(t('errorFailedToFetchData'));
       navigate('/login');
     }
-  }, [navigate]);
+  }, [navigate, t]);
 
   useEffect(() => {
     fetchPetsAndVaccinations();
   }, [fetchPetsAndVaccinations]);
-  // --- END UPDATED ---
 
-  // --- UPDATED: handleAddPet to refetch data ---
   const handleAddPet = async (newPet) => {
     try {
       await apiClient.post('/pets/', newPet);
-      fetchPetsAndVaccinations(); // This ensures pets and reminders are refreshed
-    } catch (error) { console.error('Failed to add pet:', error); alert('Failed to add pet.'); }
+      fetchPetsAndVaccinations();
+    } catch (error) { 
+      console.error('Failed to add pet:', error); 
+      alert(t('errorAddPet'));
+    }
   };
-  // --- END UPDATED ---
   
-  const handleOpenModal = (pet) => { setSelectedPet(pet); setModalOpen(true); };
-  const handleCloseModal = () => { setModalOpen(false); setSelectedPet(null); };
+  const handleOpenModal = (pet) => { 
+    setSelectedPet(pet); 
+    setModalOpen(true); 
+  };
+
+  const handleCloseModal = () => { 
+    setModalOpen(false); 
+    setSelectedPet(null); 
+  };
 
   return (
     <Container sx={{ mt: 4, mb: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        My Pets Dashboard
+        {t('dashboardTitle')}
+      </Typography>
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+        {t('platformTagline')}
       </Typography>
       
-     INDIA'S FIRST EVER COMPLETE PETCARE PLATFORM
+      <DashboardTabs 
+        petListComponent={<MyPetsTab 
+                              pets={pets} 
+                              upcomingVaccinations={upcomingVaccinations} 
+                              onAddPet={handleAddPet} 
+                              onOpenVacModal={handleOpenModal} 
+                              t={t} 
+                          />}
+        symptomCheckerComponent={<SymptomCheckerTab t={t} />} 
+        vetLocatorComponent={<VetLocator t={t} />} 
+        vetCommunityComponent={<VetCommunityTab t={t} />} 
+        nutritionComponent={<NutritionTab t={t} />} 
+        voiceAssistantComponent={<VoiceAssistantTab t={t} />} 
+      />
 
-// Add this new prop for the voice assistant tab
-<DashboardTabs 
-  petListComponent={<MyPetsTab pets={pets} upcomingVaccinations={upcomingVaccinations} onAddPet={handleAddPet} onOpenVacModal={handleOpenModal} />}
-  symptomCheckerComponent={<SymptomCheckerTab />}
-  vetLocatorComponent={<VetLocator />}
-  vetCommunityComponent={<VetCommunityTab />}
-  nutritionComponent={<NutritionTab />}
-  voiceAssistantComponent={<VoiceAssistantTab />}
-/>
-
-      {selectedPet && <VaccinationModal open={modalOpen} onClose={handleCloseModal} pet={selectedPet} />}
+      {selectedPet && <VaccinationModal open={modalOpen} onClose={handleCloseModal} pet={selectedPet} t={t} />}
     </Container>
   );
 }
